@@ -1,0 +1,5 @@
+.env
+backend-alarmas/.env
+frontend-alarmas/.env
+.idea/
+node_modules/
