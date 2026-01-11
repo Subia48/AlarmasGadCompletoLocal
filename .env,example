@@ -1,0 +1,7 @@
+PORT=3000
+JWT_SECRET=un_super_secreto_largo
+MONGO_URI=mongodb://mongo:27017/alarma_smart
+
+TWILIO_SID=AC11eb549df77ebfb31e9c7b4a2e878f6a
+TWILIO_AUTH_TOKEN=956ce843c1de448cb4bfcd281a4ba46e
+TWILIO_PHONE=+14068004809
