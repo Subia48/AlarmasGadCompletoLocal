@@ -14,9 +14,11 @@ Diseñar e implementar un sistema de alerta ciudadana que identifique y active l
 - Activación remota de sirenas físicas mediante microcontroladores ESP32.
 - Notificación automática al ECU 911, Cuerpo de Bomberos y contactos personales.
 - Plataforma web para monitoreo de alertas en tiempo real.
+<<<<<<< HEAD
 - Almacenamiento y sincronización de datos mediante MongoDB
+=======
 
----
+
 
 ## 🧩 Componentes del Sistema
 
