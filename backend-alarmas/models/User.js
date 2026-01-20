@@ -13,10 +13,21 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     telefono: { type: String },
     rol: {
-      type: String,
-      enum: ["usuario", "admin", "cuerpo_sos"],
-      default: "usuario",
-    },
+  type: String,
+  enum: [
+    "usuario",
+    "admin",
+    "cuerpo_sos",
+
+    "operador_alertas",
+    "gestor_usuarios",
+    "gestor_codigos",
+    "operador_sos",
+    "gestor_alarmas"
+  ],
+  default: "usuario",
+},
+
     contactoEmergencia: [contactSchema],
     passwordHash: { type: String, required: true },
   },

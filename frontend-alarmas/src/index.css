@@ -591,7 +591,7 @@ button {
 }
 
 .map-container {
-  height: 400px;
+  height: 900px;
 }
 
 .panel-container {
@@ -1357,3 +1357,28 @@ button {
 }
 
 
+/* =========================
+   DASHBOARD WEB CENTRADO
+========================= */
+
+.dashboard-grid {
+  max-width: 1400px;          /* no se estira infinito */
+  margin: 0 auto;             /* centra horizontal */
+  padding: 1.5rem 1.75rem;    /* aire lateral suave */
+  box-sizing: border-box;
+}
+
+
+.panel-container,
+.map-container {
+  background: transparent;
+  padding: 0.5rem;   /* separación interna leve */
+}
+
+
+@media (min-width: 1024px) {
+  .dashboard-grid {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+}

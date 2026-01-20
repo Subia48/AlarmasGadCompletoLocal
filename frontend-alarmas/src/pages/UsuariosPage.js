@@ -1,4 +1,3 @@
-// src/pages/UsuariosPage.js
 import React, { useEffect, useState } from "react";
 import {
   obtenerUsuarios,
@@ -6,8 +5,26 @@ import {
   eliminarUsuarioCompletamente,
   crearUsuario,
 } from "../api/usuarios";
+import { useAuth } from "../context/AuthContext";
+
+/**
+ * ROLES DEL SISTEMA
+ */
+const ROLES = [
+  { value: "usuario", label: "Usuario" },
+  { value: "cuerpo_sos", label: "Cuerpo SOS" },
+  { value: "operador_alertas", label: "Operador de Alertas" },
+  { value: "gestor_usuarios", label: "Gestor de Usuarios" },
+  { value: "gestor_codigos", label: "Gestor de Códigos" },
+  { value: "operador_sos", label: "Operador SOS" },
+  { value: "gestor_alarmas", label: "Gestor de Alarmas" },
+  { value: "admin", label: "Admin" }, // 👑 solo visible para admin
+];
 
 export default function UsuariosPage() {
+  const { user } = useAuth();
+  const miRol = user.rol;
+
   const [usuarios, setUsuarios] = useState([]);
   const [nuevoUsuario, setNuevoUsuario] = useState({
     cedula: "",
@@ -28,20 +45,37 @@ export default function UsuariosPage() {
     try {
       const lista = await obtenerUsuarios();
       setUsuarios(lista);
-    } catch (err) {
-      setError(err.message || "Error cargando usuarios");
+    } catch {
+      setError("Error cargando usuarios");
     }
   };
 
   const handleActualizarRol = async (id, rol) => {
-    await actualizarRol(id, rol);
-    cargarUsuarios();
+    try {
+      await actualizarRol(id, rol);
+      cargarUsuarios();
+    } catch (err) {
+      setError(err.response?.data?.message || "Error actualizando rol");
+    }
   };
 
-  const handleEliminar = async (id) => {
+  const handleEliminar = async (u) => {
+    if (
+      miRol === "gestor_usuarios" &&
+      u.rol === "admin"
+    ) {
+      alert("No puedes eliminar un administrador");
+      return;
+    }
+
     if (!window.confirm("¿Eliminar este usuario?")) return;
-    await eliminarUsuarioCompletamente(id);
-    cargarUsuarios();
+
+    try {
+      await eliminarUsuarioCompletamente(u.id);
+      cargarUsuarios();
+    } catch {
+      setError("Error eliminando usuario");
+    }
   };
 
   const handleCrearUsuario = async (e) => {
@@ -53,16 +87,25 @@ export default function UsuariosPage() {
       return;
     }
 
-    await crearUsuario(nuevoUsuario);
-    setNuevoUsuario({
-      cedula: "",
-      nombre: "",
-      email: "",
-      password: "",
-      rol: "usuario",
-    });
-    setMostrarModal(false);
-    cargarUsuarios();
+    if (miRol === "gestor_usuarios" && nuevoUsuario.rol === "admin") {
+      setError("No puedes crear administradores");
+      return;
+    }
+
+    try {
+      await crearUsuario(nuevoUsuario);
+      setMostrarModal(false);
+      setNuevoUsuario({
+        cedula: "",
+        nombre: "",
+        email: "",
+        password: "",
+        rol: "usuario",
+      });
+      cargarUsuarios();
+    } catch (err) {
+      setError(err.response?.data?.message || "Error creando usuario");
+    }
   };
 
   const usuariosFiltrados = usuarios.filter(
@@ -89,65 +132,72 @@ export default function UsuariosPage() {
         onChange={(e) => setBusqueda(e.target.value)}
       />
 
-      {/* LISTA RESPONSIVE */}
       <div className="grid-cards">
-        {usuariosFiltrados.map((u) => (
-          <div key={u.id} className="card">
-            <p><b>Cédula:</b> {u.cedula}</p>
-            <p><b>Nombre:</b> {u.nombre}</p>
-            <p><b>Email:</b> {u.email}</p>
+        {usuariosFiltrados.map((u) => {
+          const adminProtegido =
+            miRol === "gestor_usuarios" && u.rol === "admin";
 
-            <label>Rol:</label>
-            <select
-              className="input"
-              value={u.rol}
-              onChange={(e) => handleActualizarRol(u.id, e.target.value)}
-            >
-              <option value="usuario">Usuario</option>
-              <option value="admin">Admin</option>
-              <option value="cuerpo_sos">Cuerpo SOS</option>
-            </select>
+          return (
+            <div key={u.id} className="card">
+              <p><b>Cédula:</b> {u.cedula}</p>
+              <p><b>Nombre:</b> {u.nombre}</p>
+              <p><b>Email:</b> {u.email}</p>
 
-            <button
-              className="btn btn-danger full-width"
-              onClick={() => handleEliminar(u.id)}
-            >
-              🗑 Eliminar
-            </button>
-          </div>
-        ))}
+              <label>Rol:</label>
+              <select
+                className="input"
+                value={u.rol}
+                disabled={adminProtegido}
+                onChange={(e) =>
+                  handleActualizarRol(u.id, e.target.value)
+                }
+              >
+                {ROLES.filter(
+                  (r) => miRol === "admin" || r.value !== "admin"
+                ).map((r) => (
+                  <option key={r.value} value={r.value}>
+                    {r.label}
+                  </option>
+                ))}
+              </select>
+
+              <button
+                className="btn btn-danger full-width"
+                disabled={adminProtegido}
+                onClick={() => handleEliminar(u)}
+              >
+                🗑 Eliminar
+              </button>
+
+              {adminProtegido && (
+                <small className="text-muted">
+                  Usuario administrador protegido
+                </small>
+              )}
+            </div>
+          );
+        })}
       </div>
 
-      {/* MODAL */}
       {mostrarModal && (
         <div className="modal-backdrop">
           <div className="modal-card">
             <h3>Nuevo Usuario</h3>
 
             <form onSubmit={handleCrearUsuario} className="form-column">
-              <input
-                className="input"
-                placeholder="Cédula"
+              <input className="input" placeholder="Cédula"
                 value={nuevoUsuario.cedula}
                 onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, cedula: e.target.value })}
               />
-              <input
-                className="input"
-                placeholder="Nombre"
+              <input className="input" placeholder="Nombre"
                 value={nuevoUsuario.nombre}
                 onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, nombre: e.target.value })}
               />
-              <input
-                className="input"
-                placeholder="Email"
-                type="email"
+              <input className="input" placeholder="Email" type="email"
                 value={nuevoUsuario.email}
                 onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, email: e.target.value })}
               />
-              <input
-                className="input"
-                placeholder="Contraseña"
-                type="password"
+              <input className="input" placeholder="Contraseña" type="password"
                 value={nuevoUsuario.password}
                 onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, password: e.target.value })}
               />
@@ -157,9 +207,11 @@ export default function UsuariosPage() {
                 value={nuevoUsuario.rol}
                 onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, rol: e.target.value })}
               >
-                <option value="usuario">Usuario</option>
-                <option value="admin">Admin</option>
-                <option value="cuerpo_sos">Cuerpo SOS</option>
+                {ROLES.filter(
+                  (r) => miRol === "admin" || r.value !== "admin"
+                ).map((r) => (
+                  <option key={r.value} value={r.value}>{r.label}</option>
+                ))}
               </select>
 
               <div className="row">

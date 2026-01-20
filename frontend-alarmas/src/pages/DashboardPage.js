@@ -4,46 +4,53 @@ import AlarmasPage from "./AlarmasPage";
 import AlertasPage from "./AlertasPage";
 import UsuariosPage from "./UsuariosPage";
 import UsuarioHomePage from "./UsuarioHomePage";
-import { useAuth } from "../context/AuthContext";
 import CodigosEmergenciaPage from "./CodigosEmergenciaPage";
+import { useAuth } from "../context/AuthContext";
 
+const ROLE_SECTIONS = {
+  admin: ["alarmas", "alertas", "usuarios", "codigos"],
+  cuerpo_sos: ["alertas"],
+  operador_alertas: ["alarmas", "alertas"],
+  gestor_usuarios: ["usuarios"],
+  gestor_codigos: ["codigos"],
+  operador_sos: ["alarmas", "alertas", "codigos"],
+  gestor_alarmas: ["alarmas"],
+  usuario: ["home"],
+};
+
+const SECTION_COMPONENTS = {
+  alarmas: <AlarmasPage />,
+  alertas: <AlertasPage />,
+  usuarios: <UsuariosPage />,
+  codigos: <CodigosEmergenciaPage />,
+  home: <UsuarioHomePage />,
+};
 
 export default function DashboardPage() {
-  const [seccion, setSeccion] = useState("alarmas");
   const { user, logout } = useAuth();
+  const rol = user?.rol || "usuario";
 
-  if (!user) return null;
-
-  const rol = user.rol || "usuario";
+  const sections = ROLE_SECTIONS[rol] || ["home"];
+  const [seccion, setSeccion] = useState(sections[0]);
 
   return (
     <div className="dashboard-container">
       <header>
         <div className="logo-title-container">
-          <img
-            src="/alarmasmart.webp"
-            width="150px"
-            alt="Logo"
-            className="logo"
-          />
+          <img src="/alarmasmart.webp" width="150" alt="Logo" />
         </div>
 
-        {/* NAV SEGÚN ROL */}
+        {/* NAV DINÁMICO */}
         <nav>
-          {rol === "admin" && (
-            <>
-              <button onClick={() => setSeccion("alarmas")}>Alarmas</button>
-              <button onClick={() => setSeccion("alertas")}>Alertas</button>
-              <button onClick={() => setSeccion("usuarios")}>Usuarios</button>
-              <button onClick={() => setSeccion("codigos")}>
-      Códigos de Emergencia
-    </button>
-            </>
-          )}
-
-          {rol === "cuerpo_sos" && (
-            <button onClick={() => setSeccion("alertas")}>Alertas</button>
-          )}
+          {sections.map((sec) => (
+            <button key={sec} onClick={() => setSeccion(sec)}>
+              {sec === "alarmas" && "Alarmas"}
+              {sec === "alertas" && "Alertas"}
+              {sec === "usuarios" && "Usuarios"}
+              {sec === "codigos" && "Códigos de Emergencia"}
+              {sec === "home" && "Inicio"}
+            </button>
+          ))}
         </nav>
 
         <div className="user-info">
@@ -52,19 +59,8 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* CONTENIDO SEGÚN ROL */}
-      {rol === "admin" && (
-        <>
-          {seccion === "alarmas" && <AlarmasPage />}
-          {seccion === "alertas" && <AlertasPage />}
-          {seccion === "usuarios" && <UsuariosPage />}
-           {seccion === "codigos" && <CodigosEmergenciaPage />}
-        </>
-      )}
-
-      {rol === "cuerpo_sos" && <AlertasPage />}
-
-      {rol === "usuario" && <UsuarioHomePage />}
+      {/* CONTENIDO */}
+      <main>{SECTION_COMPONENTS[seccion]}</main>
 
       <footer>
         <p>

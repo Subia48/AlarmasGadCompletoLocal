@@ -7,7 +7,7 @@ const { auth, requireRole } = require("../middleware/auth");
 const router = express.Router();
 
 // GET /api/admin/alerts?estado=pendiente
-router.get("/", auth, requireRole("admin", "cuerpo_sos"), async (req, res) => {
+router.get("/", auth, requireRole("admin", "cuerpo_sos", "operador_sos"), async (req, res) => {
   try {
     const { estado } = req.query;
     const query = {};
@@ -41,7 +41,7 @@ router.get("/", auth, requireRole("admin", "cuerpo_sos"), async (req, res) => {
 router.put(
   "/:id/atender",
   auth,
-  requireRole("admin", "cuerpo_sos"),
+  requireRole("admin", "cuerpo_sos", "operador_sos"),
   async (req, res) => {
     try {
       const { tipoEmergencia, descripcionEmergencia } = req.body;

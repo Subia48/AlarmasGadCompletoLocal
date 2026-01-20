@@ -14,14 +14,14 @@ Diseñar e implementar un sistema de alerta ciudadana que identifique y active l
 - Activación remota de sirenas físicas mediante microcontroladores ESP32.
 - Notificación automática al ECU 911, Cuerpo de Bomberos y contactos personales.
 - Plataforma web para monitoreo de alertas en tiempo real.
-- Almacenamiento y sincronización de datos mediante Firebase.
+- Almacenamiento y sincronización de datos mediante MongoDB
 
 ---
 
 ## 🧩 Componentes del Sistema
 
 ### 1. Aplicación Móvil (Android)
-- Registro e inicio de sesión (Firebase Authentication)
+- Registro e inicio de sesión 
 - Botón de alerta de emergencia
 - Envío de ubicación y notificaciones automáticas
 
@@ -31,9 +31,9 @@ Diseñar e implementar un sistema de alerta ciudadana que identifique y active l
 - Gestión de usuarios y alarmas
 
 ### 3. Dispositivo IoT
-- Microcontrolador ESP32 conectado a la nube
+- Microcontrolador ESP32 conectado a internet
 - Activación de sirenas mediante relé
-- Integración con Firebase Realtime Database
+- Integración con MongoDB
 
 ---
 
@@ -41,7 +41,7 @@ Diseñar e implementar un sistema de alerta ciudadana que identifique y active l
 
 - **Frontend móvil:** Java + Android Studio  
 - **Frontend web:** HTML, CSS, JavaScript  
-- **Backend:** Firebase (Auth, Firestore, Cloud Functions)  
+- **Backend:** MongoDB, Express
 - **IoT:** ESP32, sensores, relés  
 
 ---
@@ -49,6 +49,6 @@ Diseñar e implementar un sistema de alerta ciudadana que identifique y active l
 ## 📐 Arquitectura General
 
 ```text
-[App Móvil] --> [Firebase] --> [ESP32 - Alarma]  
+[App Móvil] --> [MongoDB] --> [ESP32 - Alarma]  
              \--> [Plataforma Web - ECU 911]  
              \--> [Notificación SMS / Contacto]

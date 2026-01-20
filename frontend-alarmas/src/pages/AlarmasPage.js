@@ -322,7 +322,7 @@ export default function AlarmasPage() {
       </div>
 
       {/* COLUMNA DERECHA */}
-      <div style={{ display: "grid", gridTemplateRows: "auto 1fr" }}>
+      <div className="map-container">
         <h3>Mapa de Alarmas</h3>
         <Mapa alarmas={alarmas} />
       </div>

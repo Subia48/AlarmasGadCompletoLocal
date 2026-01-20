@@ -13,7 +13,7 @@ const router = express.Router();
    👉 RUTA ESPECÍFICA (DEBE IR PRIMERA)
    👉 Genera alerta de prueba y activa la alarma
 ===================================================== */
-router.post("/:id/probar", auth, requireRole("admin"), async (req, res) => {
+router.post("/:id/probar", auth, requireRole("admin", "operador_sos","gestor_alarmas"), async (req, res) => {
   console.log("🧪 PROBANDO ALARMA", req.params.id);
 
   try {
@@ -77,7 +77,7 @@ router.get("/", auth, async (req, res) => {
 /* =====================================================
    POST /api/alarms  (solo admin)
 ===================================================== */
-router.post("/", auth, requireRole("admin"), async (req, res) => {
+router.post("/", auth, requireRole("admin","operador_sos","gestor_alarmas"), async (req, res) => {
   try {
     const { nombre, direccion, lat, lng, deviceId } = req.body;
 
@@ -107,7 +107,7 @@ router.post("/", auth, requireRole("admin"), async (req, res) => {
 /* =====================================================
    PUT /api/alarms/:id  (solo admin)
 ===================================================== */
-router.put("/:id", auth, requireRole("admin"), async (req, res) => {
+router.put("/:id", auth, requireRole("admin", "operador_sos", "gestor_alarmas"), async (req, res) => {
   try {
     const { nombre, direccion, lat, lng, estado, deviceId } = req.body;
 
@@ -138,7 +138,7 @@ router.put("/:id", auth, requireRole("admin"), async (req, res) => {
 /* =====================================================
    DELETE /api/alarms/:id  (solo admin)
 ===================================================== */
-router.delete("/:id", auth, requireRole("admin"), async (req, res) => {
+router.delete("/:id", auth, requireRole("admin","gestor_alarmas"), async (req, res) => {
   try {
     await Alarm.findByIdAndDelete(req.params.id);
     res.json({ message: "Alarma eliminada" });
