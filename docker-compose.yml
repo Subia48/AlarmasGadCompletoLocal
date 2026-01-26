@@ -8,7 +8,7 @@ services:
     volumes:
       - mongo_data:/data/db
     ports:
-      - "27017:27017"
+      - "27018:27017"
 
   backend:
     build: ./backend-alarmas
@@ -19,7 +19,14 @@ services:
     depends_on:
       - mongo
     ports:
-      - "3000:3000"
+      - "12081:3000"
+
+  docs:
+    build: ./mi-documentacion
+    container_name: alarma-docs
+    restart: always
+    ports:
+      - "12082:80"    
 
   frontend:
     build: ./frontend-alarmas
@@ -28,7 +35,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "80:80"
+      - "12080:80"
 
 volumes:
   mongo_data:
